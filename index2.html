@@ -1,0 +1,358 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <!--[if IE]>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <![endif]-->
+    <title>这可能是地球上最美的h5</title>
+    <meta id="share-name" itemprop="name" content="这可能是地球之上最美的视角">
+    <meta id="share-description" itemprop="description" content="我们终将和世界的美好相遇">
+    <meta id="share-image" itemprop="image" content="https://wa.qq.com/xplan/earth/dist/img/share.jpg">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    
+    <link rel="stylesheet" type="text/css" href="index.css">
+
+</head>
+<body>
+
+<div id="Stats-output">
+</div>
+
+<div class="mod-world">
+    <div class="mod-wrap" id="main">
+        <script>
+            var scaleResize = function(json){
+                 var d = {
+                    size : 'cover',
+                    center : 50,
+                    normal : 50,
+                    w : 375,  //PSD设计稿的宽
+                    h : 600  //PSD设计稿的高
+                },
+                scale = 1,
+                moveY = 0,  //不是居中时候的偏移量
+                moveX = 0,  //不是居中时候的偏移量
+                el = document.documentElement,
+                w = el.clientWidth,
+                h = el.clientHeight;
+
+                for(var attr in json){
+                    d[attr] = json[attr];
+                }
+
+                if(d.size == 'cover'){  //if-else 从大概率 到 小概率的排序
+                    if( w/h > d.w/d.h ){
+                        wResize();
+                    }else{
+                        hResize();
+                    }
+                }else if(d.size == 'contain'){
+                    if( w/h < d.w/d.h ){
+                        wResize();
+                    }else{
+                        hResize();
+                    }
+                }else if(d.size == 'width'){   
+                    wResize();
+                }else if(d.size == 'height'){
+                    hResize();
+                }else if(d.size == "draw"){ //拉伸
+                    drawResize();
+                    return;
+                }
+
+                document.getElementById(d.id).style.cssText = ' -webkit-transform:scale('+scale+') translate(-'+(d.normal/scale + moveX)+'%,-'+(d.normal/scale + moveY)+'%);';
+
+                function wResize(){
+                    scale = w / d.w;
+                    if(d.center == 50){ //虽然什么都不做，但居中是大概率 所以大概率情况下 if-else 只执行一步
+
+                    }else if(d.center == 0){
+                        moveY = (h / scale - d.h) / d.h * 50;
+                    }else if(d.center == 100){
+                        moveY = - (h / scale - d.h) / d.h * 50;
+                    }
+                }
+
+                function hResize(){
+                    scale = h / d.h;
+                    console.log(scale , 88888)
+                    if(d.center == 50){
+
+                    }else if(d.center == 0){
+                        moveX = (w / scale - d.w) / d.w * 50;
+                    }else if(d.center == 100){
+                        moveX = - (w / scale - d.w) / d.w * 50;
+                    }
+                }
+
+                function drawResize(){
+                    var scaleX = w/d.w,
+                        scaleY = h/d.h;
+                    scale = scaleX + ',' + scaleY;
+                    document.getElementById(d.id).style.cssText = ' -webkit-transform:scale('+scale+') translate(-'+(d.normal/scaleX + moveX)+'%,-'+(d.normal/scaleY + moveY)+'%);';    
+                }               
+            };
+            scaleResize({
+                id: 'main', //必填 
+                size : 'height',  // 非必填 默认参数cover 其他contain width height draw(拉伸)
+                center : 50   // 非必填 默认参数50 其他 0上  100下 或 左 中 右
+            });
+            window.addEventListener("resize", function(){
+                clearTimeout(window.timer_resize);
+                window.timer_resize = setTimeout(function(){
+                    // scaleResize({
+                    //   size : 'width'
+                    // });
+                },50)
+            }, false);
+        </script>
+         <!-- Div which will hold the Output -->
+        <div id="WebGL-output">
+        </div>
+
+        <div class="mod-main">
+            <div class="bg-cover"></div>
+            <div class="btn-show-parallax" id="btn"> 
+                <div class="bg"></div>
+                <div class="inner"></div>
+                <div class="text"></div>
+            </div>
+            
+
+            <div class="cloud-box" id="box" >
+
+                <div class="mod-cloud" id="mod_cloud" >
+                    <canvas id="cvs_cloud" width="375" height="600"></canvas>
+                </div>
+
+                <div class="mod-video" id="mod_video" >
+                    <video id="video" width="100%" height="100%" x-webkit-airplay="true" webkit-playsinline="" playsinline="true" preload="true" src="./img/r0023hb5s6k.mp4"></video>
+                </div>
+            
+            </div>
+
+        </div>
+    </div>
+    <div id="Stats-output" style="display: none">
+    </div>
+</div>
+
+<!-- Javascript code that runs our Three.js examples -->
+<script src="js/three-69.js"></script>
+<script src="js/stats.js"></script>
+<script src="js/Tween.js"></script>
+<script src="js/OrbitControls.js"></script>  
+
+<script>
+
+    //初始化页面一些信息
+    //防止iphone 快速点击两下 页面往上调
+    //禁止页面滑动
+    document.documentElement.addEventListener('touchmove',function(e){e.preventDefault();})
+    
+   //页面初始化渲染
+    function init() {
+
+        var stats = initStats();
+
+
+        //创建场景
+        var scene = new THREE.Scene();
+
+        //摄像机
+        var camera = new THREE.PerspectiveCamera(45, 375 / 600, 0.1, 1000);
+
+        //初始化canvas大小
+        var webGLRenderer = new THREE.WebGLRenderer({
+            alpha : true
+        });
+        webGLRenderer.setSize(375, 600);
+        //阴影
+        webGLRenderer.shadowMapEnabled = true;
+
+
+
+        var earth = createEarth();
+        function createEarth(){
+
+            //创建球体 几何形状
+            var earth_sphereGeometry = new THREE.SphereGeometry(15,40,40);
+
+            //纹理
+            var texture = THREE.ImageUtils.loadTexture("./img/earth4.jpg");
+            var normalTexture = THREE.ImageUtils.loadTexture("./img/earth_bump.jpg");
+            var specTexture = THREE.ImageUtils.loadTexture("./img/earth_spec.jpg");
+
+
+            //材质 对光照有反应的 材质 （材质有3种）
+            var material = new THREE.MeshPhongMaterial({ 
+                map:texture ,
+                bumpMap: normalTexture ,
+                bumpScale : .5,
+                specularMap : specTexture,
+                specular : new THREE.Color( 0x909090),
+                shininess : 1
+            });
+
+
+            //创建球体
+            // var earth = new THREE.Mesh( earth_sphereGeometry,material );
+            var earth = THREE.SceneUtils.createMultiMaterialObject(earth_sphereGeometry, [material]);
+
+            return earth; 
+        }
+
+
+        //场景添加球体
+        scene.add(earth);
+
+
+        //添加可以旋转镜头
+        var orbit = new THREE.OrbitControls(camera);
+
+        //灯光效果
+        var ambiColor = "#0c0c0c";
+        var ambientLight = new THREE.AmbientLight(ambiColor);
+        scene.add(ambientLight);
+
+
+        // var spotLight = new THREE.DirectionalLight(0xffffff);
+        // spotLight.position.set(-60, 0, 30);
+        // spotLight.intensity = 1.5;
+        // scene.add(spotLight);
+
+        var pointColor = "#0xffffff";
+        var directionalLight = new THREE.DirectionalLight(pointColor);
+        directionalLight.position.set(-60, 0, 30);
+        directionalLight.intensity = 1.5;
+        scene.add(directionalLight);
+
+        // directionalLight.position.x = 67.08203932499369 * Math.sin( orbit.phi ) * Math.sin( orbit.theta );
+        // directionalLight.position.y = 67.08203932499369 * Math.cos( orbit.phi );
+        // directionalLight.position.z = 67.08203932499369 * Math.sin( orbit.phi ) * Math.cos( orbit.theta );
+
+
+
+        // position and point the camera to the center of the scene
+        camera.position.x = 0;
+        camera.position.y = 0;
+        camera.position.z = 80;
+        camera.lookAt(new THREE.Vector3(0, 0, 0));
+
+
+        //输出canvas
+        document.getElementById("WebGL-output").appendChild(webGLRenderer.domElement);
+
+        // call the render function
+        var step = 0;
+
+
+        //是否自动旋转
+        // orbit.autoRotate = true;
+
+        render();
+
+
+
+        var theta_cur =  0; 
+        var phi_cur =  1.5707963267948966; 
+
+        var theta_1 =  -170 * Math.PI / 180; 
+        var phi_1 =  80 * Math.PI / 180; 
+
+        var flag = false;
+
+        gid('btn').addEventListener('touchstart',function(){
+            if(this.flag) return;
+            toMove();
+            //防止多次点击
+            this.flag = true;
+            flag = true;
+        })
+        gid('btn').addEventListener('touchend',function(){
+            flag = false;
+        })
+
+        //地球移动到对应的点
+        function toMove(){
+            orbit.flag = true;
+
+            theta_cur = orbit.theta;
+            phi_cur = orbit.phi;
+
+            //旋转小于180deg
+            if(Math.abs(theta_1 - theta_cur) > Math.PI ){
+                if(theta_1 < 0){
+                    theta_1+=(Math.PI*2);
+                }else{
+                    theta_cur+=(Math.PI*2);
+                }
+            }
+
+            new TWEEN.Tween( { theta: theta_cur , phi : phi_cur } )
+                // .delay(1000)
+                .to( { theta : theta_1  , phi : phi_1  }, 800 )
+                .onUpdate( function() {
+                    theta_cur = this.theta;
+                    phi_cur = this.phi;
+                })
+                .onComplete(function(){
+                    orbit.flag = false;
+                    orbit.enabled = true;
+                    gid('btn').flag = false;
+                })
+                .start();
+        }
+
+
+
+        function render(time) {
+
+            stats.update();
+
+
+
+            // console.log(orbit.theta,orbit.phi)
+
+            orbit.update(theta_cur,phi_cur);  //点击的时候 执行旋转
+
+            TWEEN.update( time );
+
+            // earth.rotation.y = step += 0.01;
+
+            // render using requestAnimationFrame
+            requestAnimationFrame(render);
+            webGLRenderer.render(scene, camera);
+        }
+
+        function initStats() {
+
+            var stats = new Stats();
+            stats.setMode(0); // 0: fps, 1: ms
+
+
+            // Align top-left
+            stats.domElement.style.position = 'absolute';
+            stats.domElement.style.left = '0px';
+            stats.domElement.style.top = '0px';
+
+            document.getElementById("Stats-output").appendChild(stats.domElement);
+
+            return stats;
+        }
+    }
+    window.onload = init;
+
+    function gid(v){
+        return document.getElementById(v);
+    }
+
+
+</script>
+</body>
+</html>

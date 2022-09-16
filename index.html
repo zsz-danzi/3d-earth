@@ -1,0 +1,608 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <!--[if IE]>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <![endif]-->
+    <title>这可能是地球上最美的h5</title>
+    <meta id="share-name" itemprop="name" content="这可能是地球之上最美的视角">
+    <meta id="share-description" itemprop="description" content="我们终将和世界的美好相遇">
+    <meta id="share-image" itemprop="image" content="https://wa.qq.com/xplan/earth/dist/img/share.jpg">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    
+    <link rel="stylesheet" type="text/css" href="index.css">
+
+</head>
+<body>
+
+<div class="mod-world">
+<div class="mod-wrap" id="main">
+    <script>
+        var scaleResize = function(json){
+             var d = {
+                size : 'cover',
+                center : 50,
+                normal : 50,
+                w : 375,  //PSD设计稿的宽
+                h : 600  //PSD设计稿的高
+            },
+            scale = 1,
+            moveY = 0,  //不是居中时候的偏移量
+            moveX = 0,  //不是居中时候的偏移量
+            el = document.documentElement,
+            w = el.clientWidth,
+            h = el.clientHeight;
+
+            for(var attr in json){
+                d[attr] = json[attr];
+            }
+
+            if(d.size == 'cover'){  //if-else 从大概率 到 小概率的排序
+                if( w/h > d.w/d.h ){
+                    wResize();
+                }else{
+                    hResize();
+                }
+            }else if(d.size == 'contain'){
+                if( w/h < d.w/d.h ){
+                    wResize();
+                }else{
+                    hResize();
+                }
+            }else if(d.size == 'width'){   
+                wResize();
+            }else if(d.size == 'height'){
+                hResize();
+            }else if(d.size == "draw"){ //拉伸
+                drawResize();
+                return;
+            }
+
+            document.getElementById(d.id).style.cssText = ' -webkit-transform:scale('+scale+') translate(-'+(d.normal/scale + moveX)+'%,-'+(d.normal/scale + moveY)+'%);';
+
+            function wResize(){
+                scale = w / d.w;
+                if(d.center == 50){ //虽然什么都不做，但居中是大概率 所以大概率情况下 if-else 只执行一步
+
+                }else if(d.center == 0){
+                    moveY = (h / scale - d.h) / d.h * 50;
+                }else if(d.center == 100){
+                    moveY = - (h / scale - d.h) / d.h * 50;
+                }
+            }
+
+            function hResize(){
+                scale = h / d.h;
+                console.log(scale , 88888)
+                if(d.center == 50){
+
+                }else if(d.center == 0){
+                    moveX = (w / scale - d.w) / d.w * 50;
+                }else if(d.center == 100){
+                    moveX = - (w / scale - d.w) / d.w * 50;
+                }
+            }
+
+            function drawResize(){
+                var scaleX = w/d.w,
+                    scaleY = h/d.h;
+                scale = scaleX + ',' + scaleY;
+                document.getElementById(d.id).style.cssText = ' -webkit-transform:scale('+scale+') translate(-'+(d.normal/scaleX + moveX)+'%,-'+(d.normal/scaleY + moveY)+'%);';    
+            }               
+        };
+        scaleResize({
+            id: 'main', //必填 
+            size : 'height',  // 非必填 默认参数cover 其他contain width height draw(拉伸)
+            center : 50   // 非必填 默认参数50 其他 0上  100下 或 左 中 右
+        });
+        window.addEventListener("resize", function(){
+            clearTimeout(window.timer_resize);
+            window.timer_resize = setTimeout(function(){
+                // scaleResize({
+                //   size : 'width'
+                // });
+            },50)
+        }, false);
+    </script>
+     <!-- Div which will hold the Output -->
+    <div id="WebGL-output">
+    </div>
+
+    <div class="mod-main">
+        <div class="bg-cover"></div>
+        <div class="btn-show-parallax" id="btn"> 
+            <div class="bg"></div>
+            <div class="inner"></div>
+            <div class="text"></div>
+        </div>
+        
+
+        <div class="cloud-box" id="box" >
+
+            <div class="mod-cloud" id="mod_cloud" >
+                <canvas id="cvs_cloud" width="375" height="600"></canvas>
+            </div>
+
+            <div class="mod-video" id="mod_video" >
+                <video id="video" width="100%" height="100%" x-webkit-airplay="true" webkit-playsinline="" playsinline="true" preload="true" src="./img/r0023hb5s6k.mp4"></video>
+            </div>
+        
+        </div>
+
+    </div>
+</div>
+<div id="Stats-output" style="display: none">
+</div>
+</div>
+
+
+<!-- Javascript code that runs our Three.js examples -->
+<script src="js/three-69.js"></script>
+<script src="js/stats.js"></script>
+<script src="js/Tween.js"></script>
+<script src="js/OrbitControls.js"></script>  
+<script src="js/canvas_fa.js"></script>  
+
+<script>
+
+
+    //初始化页面一些信息
+    //防止iphone 快速点击两下 页面往上调
+    //禁止页面滑动
+    document.documentElement.addEventListener('touchmove',function(e){e.preventDefault();})
+
+   //页面初始化渲染
+    function init() {
+
+
+
+        // var stats = initStats();
+
+        //创建场景
+        var scene = new THREE.Scene();
+
+        //摄像机
+        var camera = new THREE.PerspectiveCamera(45, 375 / 600, 0.1, 1000);
+
+        //初始化canvas大小
+        var webGLRenderer = new THREE.WebGLRenderer({
+            alpha : true
+        });
+        webGLRenderer.setSize(375, 600);
+        //阴影
+        webGLRenderer.shadowMapEnabled = true;
+
+
+        //创建地球
+        var earth = createEarth();
+
+        function createEarth(){
+            //创建球体 几何形状
+            var earth_sphereGeometry = new THREE.SphereGeometry(15,40,40);
+
+            //纹理
+            var texture = THREE.ImageUtils.loadTexture("./img/earth4.jpg");
+            var normalTexture = THREE.ImageUtils.loadTexture("./img/earth_bump.jpg");
+            var specTexture = THREE.ImageUtils.loadTexture("./img/earth_spec.jpg");
+
+
+            //材质 对光照有反应的 材质 （材质有3种）
+            var material = new THREE.MeshPhongMaterial({ 
+                map:texture ,
+                bumpMap: normalTexture ,
+                bumpScale : .5,
+                specularMap : specTexture,
+                specular : new THREE.Color( 0xff0000 ),
+                shininess : 1
+            });
+
+            
+            //创建球体
+            // var earth = new THREE.Mesh( earth_sphereGeometry,material );
+            var earth = THREE.SceneUtils.createMultiMaterialObject(earth_sphereGeometry, [material]);
+
+            return earth; 
+        }
+
+        //场景添加球体
+        scene.add(earth);
+
+        //创建大气层
+        var cloud = createCloud();
+
+        function createCloud(){
+            //创建球体 几何形状
+            var cloud_sphereGeometry = new THREE.SphereGeometry(15.5,40,40);
+
+            //纹理
+            var texture = THREE.ImageUtils.loadTexture("./img/earth_cloud.png");
+            var normalTexture = THREE.ImageUtils.loadTexture("./img/earth_bump.jpg");
+            var specTexture = THREE.ImageUtils.loadTexture("./img/earth_spec.jpg");
+
+
+            //材质 对光照有反应的 材质 （材质有3种）
+            var material = new THREE.MeshPhongMaterial({ 
+                map:texture ,
+                transparent : true ,
+                opacity : 1,
+                color :  '#ffffff' ,
+                blending : THREE.AdditiveBlending
+            });
+
+            //创建球体
+            // var cloud = new THREE.Mesh( earth_sphereGeometry,material );
+            var cloud = THREE.SceneUtils.createMultiMaterialObject(cloud_sphereGeometry, [material]);
+
+            return cloud; 
+        }
+
+        //场景添加大气体
+        scene.add(cloud);
+
+
+        //添加可以旋转镜头
+        var orbit = new THREE.OrbitControls(camera);
+
+        //灯光效果
+        // var ambiColor = "#4e4c4c";
+        var ambiColor = "#7f8281";
+        var ambientLight = new THREE.AmbientLight(ambiColor);
+        scene.add(ambientLight);
+
+
+        // var spotLight = new THREE.DirectionalLight(0xffffff);
+        // spotLight.position.set(-60, 0, 30);
+        // spotLight.intensity = 1.5;
+        // scene.add(spotLight);
+
+        var pointColor = "#ffffff";
+        var directionalLight = new THREE.DirectionalLight(pointColor);
+        directionalLight.position.set(-80, 0, 0);  //灯光的半径 就是从这里算出来的
+        directionalLight.intensity = 1.5;
+        scene.add(directionalLight);
+
+   
+
+        // position and point the camera to the center of the scene
+        camera.position.x = 0;
+        camera.position.y = 0;
+        camera.position.z = 80;
+        camera.lookAt(new THREE.Vector3(0, 0, 0));
+
+
+        //输出canvas
+        document.getElementById("WebGL-output").appendChild(webGLRenderer.domElement);
+
+        // call the render function
+        var step = 0;
+
+
+        //是否自动旋转
+        // orbit.autoRotate = true;
+
+        
+
+        var theta_cur =  0; 
+        var phi_cur =  1.5707963267948966; 
+
+
+        var arr_point = [
+            {
+                theta : -156 * Math.PI / 180,
+                phi :  67 * Math.PI / 180 
+            }
+        ]
+        var theta_1 =  -154.6 * Math.PI / 180; 
+        var phi_1 =  66.79 * Math.PI / 180; 
+
+        var btn = gid('btn');
+        btn.addEventListener('touchstart',function(){
+
+            if(this.flag) return;
+            toMove();
+            //防止多次点击
+            this.flag = true;
+            flag = true;
+
+            
+        })
+
+        btn.addEventListener('touchend',function(){
+            flag = false;
+
+            gid('mod_cloud').className = 'mod-cloud';
+
+            setTimeout(function(){        
+                video.pause();
+                video_index = Math.floor(Math.random()*5);
+                video.currentTime = arr_video[video_index][0];
+            },300)
+
+            cfa.pause();
+
+            cfa.start_back();
+        })
+
+
+        //球体上面添加深圳城市
+        var point = createPoints();
+        function createPoints(name) {
+
+            var planeGeometry = new THREE.PlaneGeometry(4, 4);
+
+            var Texture = new THREE.ImageUtils.loadTexture("./img/shenzhen.png");
+
+            var material = new THREE.MeshBasicMaterial({
+                transparent : true,
+                map : Texture
+            });
+
+            var mesh = new THREE.Mesh(planeGeometry, material);
+            
+            var radius = 17;
+
+
+            mesh.position.x = radius * Math.sin( phi_1 ) * Math.sin( theta_1 ) - 2.03 ;
+            mesh.position.y = radius * Math.cos( phi_1 ) + 0.35 ; 
+            mesh.position.z = radius * Math.sin( phi_1 ) * Math.cos( theta_1 ); 
+
+            mesh.rotation.y = 3.5;
+
+            return mesh;
+
+        };
+
+        earth.add(point);
+
+
+
+        //地球移动到对应的点
+        function toMove(){
+            orbit.flag = true;
+
+            theta_cur = orbit.theta;
+            phi_cur = orbit.phi;
+
+            //旋转小于180deg
+            if(Math.abs(theta_1 - theta_cur) > Math.PI ){
+                if(theta_1 < 0){
+                    theta_1+=(Math.PI*2);
+                }else{
+                    theta_cur+=(Math.PI*2);
+                }
+            }
+
+            new TWEEN.Tween( { theta: theta_cur , phi : phi_cur } )
+                // .delay(1000)
+
+
+                .to( { theta : theta_1  , phi : phi_1  }, 600 )
+                .onUpdate( function() {
+                    theta_cur = this.theta;
+                    phi_cur = this.phi;
+                })
+                .onComplete(function(){
+                    console.log(989898)
+                    theta_cur = theta_1;
+                    phi_cur = phi_1;
+
+                    btn.flag = 1;
+
+                    setTimeout(function(){
+                        orbit.enabled = true;
+                        orbit.flag = false;
+                    },150)
+                })
+                .start();
+        }
+
+        function lightloaction(){
+            var theta =  orbit.theta - Math.PI/2 ;
+
+            directionalLight.position.x = 80 * Math.sin( orbit.phi ) * Math.sin( theta );
+            // directionalLight.position.y = 80 * Math.cos( orbit.phi ); 
+            directionalLight.position.z = 80 * Math.sin( orbit.phi ) * Math.cos( theta );  
+        }
+
+        var step = 0;
+
+
+        render();
+
+        function render(time) {
+
+
+            // stats.update();
+
+            // console.log(orbit.theta,orbit.phi)
+
+            orbit.update(theta_cur,phi_cur);  //点击的时候 执行旋转
+
+            TWEEN.update( time );
+
+            // console.log(orbit.phi, orbit.theta)  -1 就是 镜头水平方向旋转 -90度
+
+            //更新灯光的位置
+            lightloaction();
+
+            //气体自己转动
+            step-=0.0005;
+            cloud.rotation.y = step;
+
+
+            //如果移动到目标位置 执行放大地球操作
+            if(btn.flag === 1){
+                orbit.zoomOut();
+                if(orbit.radius <35 ){
+                    gid('box').className = 'cloud-box show';
+                    btn.flag = false;
+                    cfa.start();
+                }
+            }            
+
+            //如果松开手指  执行缩小地球操作
+            if(btn.flag === 2){
+                orbit.zoomIn();
+                if(orbit.radius > 80 ){
+                    orbit.radius = 80;
+                    btn.flag = false;
+                }
+            }
+
+            // earth.rotation.y = step += 0.01;
+
+            // render using requestAnimationFrame
+            requestAnimationFrame(render);
+            webGLRenderer.render(scene, camera);
+        }   
+
+
+        //初始化 云朵的播放时间
+        var frame_Imgs_1 = [
+                'kf_cloud_00000.jpg','kf_cloud_00001.jpg','kf_cloud_00002.jpg','kf_cloud_00003.jpg','kf_cloud_00004.jpg','kf_cloud_00005.jpg','kf_cloud_00006.jpg','kf_cloud_00007.jpg','kf_cloud_00008.jpg','kf_cloud_00009.jpg','kf_cloud_00010.jpg','kf_cloud_00011.jpg','kf_cloud_00012.jpg'
+            ];
+
+        var cfa = new canvasfa({
+            cav:'cvs_cloud'//【必选参数】canvas画布id
+            ,frames:frame_Imgs_1//【必选参数】帧动画的素材
+            ,url:'./img/cloud/'//【必选参数】图片路径
+            ,fps:12//【可选参数】每秒帧数，默认每秒15帧。（液晶屏每秒刷新60次，所以帧数最好是可以整除60的数）
+            ,loop:false//【可选参数】循环播放，false则单次播放并停留在最后一帧，true和默认是循环播放
+            ,autoplay:false,//【可选参数】素材加载完毕后是否自动播放； false不播放，true和默认是自动播放。可用 实例对象.start()手动开启播放
+            //,loading_done:alert1//【可选参数】参数需要是一个函数，在素材加载完毕后运行。可缺省此参数。
+            backFn:function(){
+
+                cfa.flag_t = false;
+                gid('box').className = 'cloud-box';
+                btn.flag = 2;
+            }
+        }).init(); 
+
+       
+        cfa.set_frame_fns(13,function(){
+            if(cfa.flag_t) return;
+            cfa.flag_t = true;
+
+            gid('mod_cloud').className = 'mod-cloud hide';
+
+            video.play();
+
+        });
+
+
+        //页面初始化 点击按钮播放视频
+        var video = gid('video');
+
+        btn.addEventListener('touchstart',initPlay,false)
+        function initPlay(){
+            video.src = './img/r0023hb5s6k.mp4';    
+            video.play();
+            this.removeEventListener('touchstart',initPlay,false);
+        }
+
+        var arr_video = [
+            [2,8],
+            [10,18],
+            [22,35],
+            [39,46],
+            [51,69]
+        ]
+
+        var video_index = 0;
+
+        //视频添加事件 监听如果已经播放，就暂停
+        function initVideo(){
+            if (video.currentTime){
+                video.currentTime = 2;
+                video.pause();
+                video.addEventListener("ended",function(evt) {
+                    video.currentTime = 2;
+                    video.play();
+                });
+
+                video.removeEventListener("timeupdate", initVideo, false);
+            }
+        }
+        video.addEventListener("timeupdate", initVideo, false);
+
+
+        function initStats() {
+
+            var stats = new Stats();
+            stats.setMode(0); // 0: fps, 1: ms
+
+
+            // Align top-left
+            stats.domElement.style.position = 'absolute';
+            stats.domElement.style.left = '0px';
+            stats.domElement.style.top = '0px';
+
+            document.getElementById("Stats-output").appendChild(stats.domElement);
+
+            return stats;
+        }
+    }
+
+
+    window.onload = function(){
+
+        //图片预加载
+        //预加载图片
+        //load.style.height = p.H  + 'px';
+        var imgPath = "./img/";
+        var loadingPage=(function(){
+            var imgSources  = [
+                'earth_cloud.png','earth_spec.jpg','earth4.jpg',
+                'cloud/kf_cloud_00000.jpg','cloud/kf_cloud_00001.jpg','cloud/kf_cloud_00002.jpg','cloud/kf_cloud_00003.jpg','cloud/kf_cloud_00004.jpg','cloud/kf_cloud_00005.jpg','cloud/kf_cloud_00006.jpg','cloud/kf_cloud_00007.jpg','cloud/kf_cloud_00008.jpg','cloud/kf_cloud_00009.jpg','cloud/kf_cloud_00010.jpg','cloud/kf_cloud_00011.jpg','cloud/kf_cloud_00012.jpg'
+            ];
+            
+            for (var i = 0; i < imgSources.length; i++)
+            {
+                imgSources[i]=(imgPath + imgSources[i]);
+            };
+            var loadImage = function(path, callback)
+            {
+                var img=new Image();
+                img.onload = function()
+                {
+                    img.onload = null;
+                    callback(path);
+                }
+                img.src = path;
+            }
+        
+            var imgLoader = function(imgs,callback){
+                var len = imgs.length, i=0;
+                while ( imgs.length)
+                {
+                    loadImage(imgs.shift(), function(path){
+                        callback(path, ++i, len);
+                    })
+                }
+            }
+
+            var percent=0;
+            imgLoader(imgSources, function(path,curNum, total){
+                percent = curNum/total;   
+                //speed.style.cssText = '-webkit-transform:translateY(-'+(percent * 100)+'%);';
+                if (percent == 1) {
+                    init();
+                }
+            });
+        })();  
+
+    };
+
+    function gid(v){
+        return document.getElementById(v);
+    }
+
+
+</script>
+</body>
+</html>

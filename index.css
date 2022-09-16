@@ -1,0 +1,166 @@
+/*
+ * activity reset css for mobile
+ * author : danzizhong
+ */
+html{font-size: 50px;}
+body,html{width: 100%; height: 100%; overflow: hidden; }
+body,ul,ol,h1,h2,h3,h4,h5,h6,dl,dd,form,p,a,input,textarea{margin: 0px; padding: 0px; font: 13px/1.5 Helvetica,Arial,sans-serif;}
+body{width: 100%; color: #000; overflow-x:hidden;}
+body,input{ font-family:"Helvetica Neue",Helvetica-Light,Helvetica;}
+ul,ol{list-style-type: none;}
+em,i{font-style:normal;}
+input{outline:none; border:none;}
+img{display: block;width: 100%; }
+a,input,select,textarea,ul,li,dt,dd,button{-webkit-tap-highlight-color:rgba(255,0,0,0); text-decoration: none;}
+
+/*禁止系统默认菜单*/
+img,a{-webkit-touch-callout: none}
+
+/*去除ios阴影部分*/
+textarea,input{  
+　　box-shadow:0px 0px 0px rgba(0,0,0,0);  
+    -webkit-appearance:none;  
+}  
+
+/*禁止选中文字*/
+.css{-webkit-user-select:none}
+body,canvas,div{ -moz-user-select: none;-webkit-user-select: none;-ms-user-select: none;-khtml-user-select: none;}
+
+.bod{
+	-webkit-transform:translate3d(0,0,0);
+}
+
+body{
+	width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #000;
+    background-size: cover;
+}
+#WebGL-output{
+	width: 375px;
+	height: 600px;
+	overflow: hidden;
+    position: absolute;
+    top:-40px;
+}
+
+.mod-main{
+	width: 375px;
+	height: 600px;
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 10;
+}
+.mod-main .bg-cover{
+	width: 375px;
+
+	height: 600px;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	-webkit-transform:translate(-50%,-50%);
+	background-image: url(img/bg_index_cover.png);
+	background-size: cover;
+	background-position: center center;
+    
+    margin-top: -40px;
+
+}
+.mod-main .btn-show-parallax {
+    opacity: 1;
+    display: block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 99px;
+    height: 133.5px;
+    margin: 133px 0 0 -49.5px;
+    z-index: 100;
+}
+.mod-main .btn-show-parallax .bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url(img/btn_show.png) no-repeat center;
+    background-size: cover;
+    -webkit-animation: twinkle 2s linear infinite;
+}
+.mod-main .btn-show-parallax .text {
+    opacity: 1;
+    position: absolute;
+    top: 0;
+    left: 7px;
+    width: 83px;
+    height: 27px;
+    background: url(img/btn_show_text.png) no-repeat center;
+    background-size: cover;
+    -webkit-transition: opacity 0.5s linear;
+}
+
+.mod-wrap{
+	width: 375px;
+    height: 600px;
+    background: #0c0604 url(./img/bg_loading.jpg) no-repeat center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    overflow: hidden;
+}
+
+
+.mod-cloud{
+	width: 375px;
+	height: 600px;
+	position: absolute;
+    overflow: hidden;
+	top: 0;
+	left: 0;
+	z-index: 10;
+	opacity: 1;
+    -webkit-transition: opacity 0.3s linear;
+}
+.mod-cloud canvas{
+	width: 100%;
+	height: 100%;
+	display: block;
+}
+
+.mod-video{
+	width: 375px;
+	height: 600px;
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 9;
+}
+
+.mod-main .show{
+	opacity: 1;
+}
+.mod-main .hide{
+	opacity: 0;
+}
+.cloud-box{
+	width: 100%;
+	height: 100%;
+	display: block;
+	position: absolute;
+	z-index: 8;
+	top: 0;
+	left: 0;
+	opacity: 0;
+    -webkit-transition: opacity 0.1s linear;
+}
+.mod-world{
+	width: 100%;
+	height: 100%;
+	display: block;
+	overflow: hidden;
+}
+
